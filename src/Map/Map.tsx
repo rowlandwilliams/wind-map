@@ -1,37 +1,23 @@
-import { geoAlbersUsa, geoPath, select } from "d3";
+import {
+  geoAlbersUsa,
+  geoPath,
+  select,
+  scaleLinear,
+  extent,
+  interpolateSinebow,
+} from "d3";
 import { useEffect, useMemo, useRef, useState } from "react";
 import classNames from "classnames";
 import { debounce, throttle } from "lodash";
-import { usOutline } from "./usOutline";
-import { statePolygons } from "./statePolygons";
-import { GeoProjection } from "d3-geo";
-import { usCities } from "./usCities";
+import { usOutline } from "./data/usOutline";
+import { statePolygons } from "./data/statePolygons";
+import { usCities } from "./data/usCities";
 import randomColor from "randomcolor";
+import { MapTooltip } from "./MapTooltip/MapTooltip";
 
-interface MouseData {
+export interface TooltipData {
   mouseCoords: [] | number[];
   data: string | null;
-}
-
-interface CitiesData {
-  city: string;
-  growth_from_2000_to_2013: string;
-  latitude: number;
-  longitude: number;
-  population: string;
-  rank: string;
-  state: string;
-}
-
-interface CitiesDataFinal {
-  city: string;
-  growth_from_2000_to_2013: string;
-  latitude: number;
-  longitude: number;
-  population: string;
-  rank: string;
-  state: string;
-  coords: [number, number];
 }
 
 const initialState = {
@@ -39,17 +25,19 @@ const initialState = {
   data: null,
 };
 
+const padding = 50;
+
 export const Map = () => {
   const parentRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
   const [pointIsHovered, setPointIsHovered] = useState(false);
-  const [mouseCoords, setMouseCoords] = useState<MouseData>(initialState);
+  const [tooltipData, setTooltipData] = useState<TooltipData>(initialState);
   const [isLoaded, setIsLoaded] = useState(false);
 
   const debounceSetMouse = useMemo(
-    () => throttle(setMouseCoords, 10),
-    [setMouseCoords]
+    () => throttle(setTooltipData, 10),
+    [setTooltipData]
   );
 
   const handleWindowResize = debounce((current: HTMLDivElement) => {
@@ -73,12 +61,10 @@ export const Map = () => {
       const outline = select("#outline");
       const pointsGroup = select("#point-group");
 
-      const padding = 50;
-
       const projection = geoAlbersUsa().fitExtent(
         [
-          [padding / 2, 50],
-          [width - padding, height],
+          [padding, padding],
+          [width - padding, height - padding],
         ],
         statePolygons as any
       );
@@ -86,15 +72,22 @@ export const Map = () => {
       const pathGenerator = geoPath().projection(projection);
       const suh = pathGenerator(usOutline as any);
 
-      // const coords = usCities.map((city) => {
-      //   const temp= {}
-      //   temp.city:
-      // }
-      const cities = usCities.map((city) => ({
-        ...city,
-        coords: projection([city.longitude, city.latitude]),
-        color: randomColor({ luminosity: "light" }),
-      }));
+      const cities = usCities
+        .map((city) => ({
+          ...city,
+          coords: projection([city.longitude, city.latitude]),
+          color: randomColor({ luminosity: "dark" }),
+        }))
+        .slice(0, 500);
+
+      const radiusScale = scaleLinear()
+        .domain(
+          extent(cities.map((city) => Number(city.population))) as [
+            number,
+            number
+          ]
+        )
+        .range([3, 150]);
 
       requestAnimationFrame(() => {
         outline
@@ -124,10 +117,10 @@ export const Map = () => {
           .join("circle")
           .attr("cx", (d: any) => (d.coords === null ? null : d.coords[0]))
           .attr("cy", (d: any) => (d.coords === null ? null : d.coords[1]))
-          .attr("r", (d) => 100 / Number(d.rank))
-          .attr("fill", (d) => randomColor({ luminosity: "light" }))
-          .attr("fill-opacity", 0.9)
-          .attr("stroke", "yellow")
+          .attr("r", (d) => radiusScale(Number(d.population)))
+          .attr("fill", (d, i) => interpolateSinebow(i / 100))
+          .attr("fill-opacity", 0.7)
+          .attr("stroke", "white")
           .on("mouseenter", (event, d) => {
             debounceSetMouse({
               mouseCoords: [event.pageX, event.pageY],
@@ -155,7 +148,7 @@ export const Map = () => {
     <>
       <div
         className={classNames(
-          "relative w-screen h-screen m-2 transition-all duration-1000",
+          "relative w-screen h-screen transition-all duration-1000 bg-blue-100",
           { "opacity-0": !isLoaded }
         )}
         ref={parentRef}
@@ -175,17 +168,7 @@ export const Map = () => {
           <g id="point-group"></g>
         </svg>
       </div>
-      <div
-        className={classNames("absolute bg-red-400 pointer-events-none", {
-          hidden: pointIsHovered === false,
-        })}
-        style={{
-          left: mouseCoords.mouseCoords[0],
-          top: mouseCoords.mouseCoords[1],
-        }}
-      >
-        {mouseCoords.data}
-      </div>
+      <MapTooltip pointIsHovered={pointIsHovered} tooltipData={tooltipData} />
     </>
   );
 };

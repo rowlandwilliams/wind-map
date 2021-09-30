@@ -487,15 +487,7 @@ export const usCities: CitiesData[] = [
     rank: "53",
     state: "Florida",
   },
-  {
-    city: "Honolulu",
-    growth_from_2000_to_2013: "-6.2%",
-    latitude: 21.3069444,
-    longitude: -157.8583333,
-    population: "347884",
-    rank: "54",
-    state: "Hawaii",
-  },
+
   {
     city: "Aurora",
     growth_from_2000_to_2013: "24.4%",
@@ -568,15 +560,7 @@ export const usCities: CitiesData[] = [
     rank: "62",
     state: "Pennsylvania",
   },
-  {
-    city: "Anchorage",
-    growth_from_2000_to_2013: "15.4%",
-    latitude: 61.2180556,
-    longitude: -149.9002778,
-    population: "300950",
-    rank: "63",
-    state: "Alaska",
-  },
+
   {
     city: "Stockton",
     growth_from_2000_to_2013: "21.8%",
