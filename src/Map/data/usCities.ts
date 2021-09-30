@@ -1,4 +1,4 @@
-interface CitiesData {
+export interface CitiesData {
   [key: string]: any;
   city: string;
   growth_from_2000_to_2013: string;

@@ -3,7 +3,14 @@ module.exports = {
   purge: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
   darkMode: false, // or 'media' or 'class'
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        "tt-interfaces-regular": ["TTInterfaces-Regular"],
+        "tt-interfaces-italic": ["TTInterfaces-Italic"],
+        "tt-interfaces-demi": ["TTInterfaces-Demi"],
+        "tt-interfaces-bold": ["TTInterfaces-Bold"],
+      },
+    },
     colors: {
       ...colors,
       transparent: "transparent",
