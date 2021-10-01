@@ -3,8 +3,10 @@ import {
   geoPath,
   select,
   scaleLinear,
+  scaleSequential,
   extent,
-  interpolateSinebow,
+  interpolateReds,
+  interpolateRgb,
   zoom,
 } from "d3";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -13,6 +15,8 @@ import { debounce, throttle } from "lodash";
 import { statePolygons } from "./data/statePolygons";
 import { CitiesData, usCities } from "./data/usCities";
 import { MapTooltip } from "./MapTooltip/MapTooltip";
+import { usOutline } from "./data/usOutline";
+import { colorScale } from "./utils/utils";
 
 export interface TooltipData {
   mouseCoords: [] | number[];
@@ -25,7 +29,9 @@ const initialState = {
 };
 
 const padding = 50;
-const mapGrey = "#f1f1f1";
+const mapGrey = "#1F2937";
+//"#f1f1f1";
+const backgroundColor = "#94a2a9";
 
 export const Map = () => {
   const parentRef = useRef<HTMLDivElement>(null);
@@ -75,7 +81,7 @@ export const Map = () => {
       const cities = usCities.slice(0, 400).map((city, i) => ({
         ...city,
         coords: projection([city.longitude, city.latitude]),
-        color: interpolateSinebow(i / 100),
+        color: colorScale(i),
       }));
 
       const radiusScale = scaleLinear()
@@ -85,7 +91,7 @@ export const Map = () => {
             number
           ]
         )
-        .range([3, 150]);
+        .range([3, 100]);
 
       const mapZoom = zoom()
         .scaleExtent([1, 8])
@@ -99,8 +105,8 @@ export const Map = () => {
           .selectAll("path")
           .data((statePolygons as any).features)
           .join("path")
-          .attr("stroke", "white")
-          .attr("stroke-width", 2)
+          .attr("stroke", backgroundColor)
+          .attr("stroke-width", 0.5)
           .attr("fill", mapGrey)
           .attr("d", pathGenerator as any);
       });
@@ -115,7 +121,7 @@ export const Map = () => {
           .attr("r", (d) => radiusScale(Number(d.population)))
           .attr("fill", (d, i) => d.color)
           .attr("fill-opacity", 0.7)
-          .attr("stroke", "white")
+          // .attr("stroke", "white")
           .attr("stroke-width", 0.5)
           .on("mouseenter", (event, d) => {
             debounceSetMouse({
@@ -146,9 +152,10 @@ export const Map = () => {
     <>
       <div
         className={classNames(
-          "relative w-screen h-screen transition-all duration-1000",
+          "relative w-screen h-screen transition-all duration-1000 bg-gray-900",
           { "opacity-0": !isLoaded }
         )}
+        // style={{ backgroundColor: backgroundColor }}
         ref={parentRef}
       >
         <svg width={width} height={height} id="map-svg">
@@ -167,7 +174,7 @@ export const Map = () => {
           </g>
         </svg>
       </div>
-      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 font-semibold p-4 font-tt-interfaces-bold">
+      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 font-semibold p-4 font-tt-interfaces-bold text-gray-100">
         Population of the 400 Largest US cities in 2013
       </div>
       <MapTooltip

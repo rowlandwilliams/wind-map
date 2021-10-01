@@ -1,6 +1,9 @@
 import classNames from "classnames";
 import { TooltipData } from "../Map";
-import { TooltipGrid } from "./TooltipGrid/TooltipGrid";
+import { TooltipGrid } from "./TooltipHeader/TooltipGrid/TooltipGrid";
+import { TooltipHeader } from "./TooltipHeader/TooltipHeader";
+import { TooltipText } from "./TooltipText/TooltipText";
+import { TooltipTriangles } from "./TooltipTriangles/TooltipTriangles";
 
 interface Props {
   pointIsHovered: boolean;
@@ -11,7 +14,6 @@ interface Props {
 
 const tooltipYOffset = 20;
 const yAxisTransformThreshold = 1 / 4;
-const xAxisTrasformThreshold = 1 / 8;
 
 export const MapTooltip = ({
   pointIsHovered,
@@ -30,7 +32,7 @@ export const MapTooltip = ({
   return (
     <div
       className={classNames(
-        "absolute transform flex pointer-events-none bg-white p-4 border border-gray-200 shadow-lg font-tt-interfaces-regular",
+        "absolute transform flex pointer-events-none bg-gray-900 p-4 font-tt-interfaces-regular border border-gray-500 text-gray-100",
         {
           hidden: !pointIsHovered,
           "-translate-x-1/2": inYAxisTransformThreshold,
@@ -42,59 +44,14 @@ export const MapTooltip = ({
         top:
           tooltipData.mouseCoords[1] +
           (inYAxisTransformThreshold ? tooltipYOffset : -tooltipYOffset),
+        boxShadow: "0px 9px 23px -12px rgba(253,253,253,0.24)",
       }}
     >
       <div>
-        <div className="flex items-center">
-          <TooltipGrid
-            cityRank={Number(tooltipData.data?.rank) - 1}
-            cityColor={tooltipData.data?.color}
-          />
-          <div className="font-tt-interfaces-bold text-6xl pl-4">
-            {tooltipData.data?.rank}.{" "}
-          </div>
-        </div>
-
-        <div className="whitespace-nowrap pt-4">
-          <div className="font-tt-interfaces-demi">
-            {tooltipData.data?.city}, {tooltipData.data?.state}
-          </div>
-          <div className="text-xs">
-            <span className="font-semibold">Population: </span>
-            {tooltipData.data?.population}
-          </div>
-          <div className="text-xs">
-            <span className="font-semibold">Change from 2000 to 2013: </span>
-            {tooltipData.data?.growth_from_2000_to_2013}
-          </div>
-        </div>
+        <TooltipHeader tooltipData={tooltipData} />
+        <TooltipText tooltipData={tooltipData} />
       </div>
-      <div
-        className={classNames(
-          "absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-full w-3 h-3",
-          {
-            hidden: inYAxisTransformThreshold,
-          }
-        )}
-        style={{
-          borderLeft: "12px solid transparent",
-          borderRight: "12px solid transparent",
-          borderTop: "12px solid #FFFFFF",
-        }}
-      ></div>
-      <div
-        className={classNames(
-          "absolute left-1/2 top-0 transform -translate-x-1/2 -translate-y-full w-3 h-3",
-          {
-            hidden: !inYAxisTransformThreshold,
-          }
-        )}
-        style={{
-          borderLeft: "12px solid transparent",
-          borderRight: "12px solid transparent",
-          borderBottom: "12px solid #FFFFFF",
-        }}
-      ></div>
+      <TooltipTriangles inYAxisTransformThreshold={inYAxisTransformThreshold} />
     </div>
   );
 };
