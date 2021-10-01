@@ -1,6 +1,5 @@
 import classNames from "classnames";
-import { TooltipData } from "../Map";
-import { TooltipGrid } from "./TooltipHeader/TooltipGrid/TooltipGrid";
+import { TooltipData } from "../../../types";
 import { TooltipHeader } from "./TooltipHeader/TooltipHeader";
 import { TooltipText } from "./TooltipText/TooltipText";
 import { TooltipTriangles } from "./TooltipTriangles/TooltipTriangles";

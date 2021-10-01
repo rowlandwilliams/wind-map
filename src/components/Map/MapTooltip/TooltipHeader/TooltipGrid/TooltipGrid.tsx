@@ -2,7 +2,7 @@ import { cityColors } from "../../../utils/cityColors";
 
 interface Props {
   cityRank: number;
-  cityColor: string;
+  cityColor: string | undefined;
 }
 
 export const TooltipGrid = ({ cityRank, cityColor }: Props) => {
@@ -15,6 +15,7 @@ export const TooltipGrid = ({ cityRank, cityColor }: Props) => {
       {[...Array(gridLength)].map((x, i) =>
         [...Array(gridLength)].map((x, j) => (
           <circle
+            key={cityColors[i * gridLength + j] + i + j}
             r={circleRadius}
             fill={
               i * gridLength + j === cityRank

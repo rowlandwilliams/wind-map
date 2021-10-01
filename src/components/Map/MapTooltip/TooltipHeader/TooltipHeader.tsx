@@ -1,4 +1,4 @@
-import { TooltipData } from "../../Map";
+import { TooltipData } from "../../../../types";
 import { TooltipGrid } from "./TooltipGrid/TooltipGrid";
 
 interface Props {
