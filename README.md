@@ -1,4 +1,4 @@
-# (US Cities Population Map)[https://rowlandwilliams.github.io/us-cities-population-map]
+# [US Cities Population Map] (https://rowlandwilliams.github.io/us-cities-population-map)
 
 An interactive map of the 400 largest American cities by population in 2013.
 
