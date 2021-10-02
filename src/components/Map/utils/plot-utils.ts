@@ -17,7 +17,7 @@ import { cities } from "./data/citiesFinal";
 import { DebouncedFunc } from "lodash";
 
 const padding = 50;
-const mapGrey = "#1F2937";
+const mapGrey = '#D1D5DB'//"#1F2937";
 const backgroundColor = "#94a2a9";
 
 const getMapSelections = () => {
