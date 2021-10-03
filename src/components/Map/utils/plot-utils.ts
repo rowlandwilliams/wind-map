@@ -16,7 +16,6 @@ import {
   GeoPath,
   GeoPermissibleObjects,
   ScaleLinear,
- 
 } from "d3";
 import { cities2013 } from "./data/cities2013";
 import { DebouncedFunc } from "lodash";
@@ -62,7 +61,10 @@ const getMaxRadiusFromWindowWidth = (width: number) => {
 const getRadiusScaleBasedOnWindowWidth = (width: number) => {
   return scaleLinear()
     .domain(
-      extent(cities2013.map((city) => Number(city.population))) as [number, number]
+      extent(cities2013.map((city) => Number(city.population))) as [
+        number,
+        number
+      ]
     )
     .range([3, getMaxRadiusFromWindowWidth(width)]);
 };
@@ -95,7 +97,6 @@ const plotUsBasemap = (
   });
 };
 
-
 const plotMapPoints = (
   pointsGroup: Selection<SVGSVGElement, unknown, HTMLElement, any>,
   cityData: CitiesDataWithCoords[],
@@ -116,6 +117,7 @@ const plotMapPoints = (
       .attr("r", (d) => radiusScale(Number(d.population)))
       .attr("fill", (d, i) => d.color)
       .attr("fill-opacity", 0.7)
+      .attr("stroke", mapGrey)
       .attr("stroke-width", 0.5);
 
     pointsGroup
