@@ -5,6 +5,9 @@
   "homepage": "https://rowlandwilliams.github.io/us-cities-population-map",
   "dependencies": {
     "@craco/craco": "^6.2.0",
+    "@emotion/react": "^11.4.1",
+    "@emotion/styled": "^11.3.0",
+    "@mui/material": "^5.0.2",
     "@tailwindcss/forms": "^0.3.3",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",

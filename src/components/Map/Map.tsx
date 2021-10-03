@@ -5,6 +5,8 @@ import { statePolygons } from "./utils/data/statePolygons";
 import { MapTooltip } from "./MapTooltip/MapTooltip";
 import { TooltipData } from "../../types";
 import { drawMap } from "./utils/plot-utils";
+import { TimeRadio } from "./TimeSlider/TimeSlider";
+import { citiesTimeSeries } from "./utils/data/citiesTimeSeries";
 
 const initialState = {
   mouseCoords: [],
@@ -18,11 +20,16 @@ export const Map = () => {
   const [pointIsHovered, setPointIsHovered] = useState(false);
   const [tooltipData, setTooltipData] = useState<TooltipData>(initialState);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [activeYear, setActiveYear] = useState(2000);
 
   const debounceSetMouse = useMemo(
     () => throttle(setTooltipData, 10),
     [setTooltipData]
   );
+
+  const handleYearChange = (newYear: number) => {
+    setActiveYear(newYear);
+  };
 
   const handleWindowResize = debounce((current: HTMLDivElement) => {
     setWidth(current.offsetWidth);
@@ -40,9 +47,16 @@ export const Map = () => {
   }, [parentRef, handleWindowResize]);
 
   useEffect(() => {
-    drawMap(width, height, statePolygons, debounceSetMouse, setPointIsHovered);
+    drawMap(
+      width,
+      height,
+      statePolygons,
+      debounceSetMouse,
+      setPointIsHovered,
+      citiesTimeSeries.filter((point) => point.year === activeYear)
+    );
     setIsLoaded(true);
-  }, [width, height, debounceSetMouse]);
+  }, [width, height, debounceSetMouse, activeYear]);
 
   return (
     <>
@@ -65,8 +79,14 @@ export const Map = () => {
         </svg>
       </div>
       <div className="absolute top-0 left-1/2 transform -translate-x-1/2 font-semibold p-4 font-tt-interfaces-bold text-gray-100">
-        Population of the 400 Largest US cities in 2013
+        Population of the 400 Largest US cities in {activeYear}
       </div>
+      <TimeRadio
+        sliderMin={2000}
+        sliderMax={2013}
+        activeYear={activeYear}
+        handleYearChange={handleYearChange}
+      />
       <MapTooltip
         pointIsHovered={pointIsHovered}
         tooltipData={tooltipData}
