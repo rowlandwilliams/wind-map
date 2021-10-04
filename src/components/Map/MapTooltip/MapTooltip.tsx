@@ -31,7 +31,7 @@ export const MapTooltip = ({
   return (
     <div
       className={classNames(
-        "absolute transform flex pointer-events-none bg-gray-900 p-4 font-tt-interfaces-regular border border-gray-500 text-gray-100",
+        "absolute transform flex pointer-events-none bg-gray-900 p-4 font-tt-interfaces-regular border border-gray-500 text-gray-100 shadow-2xl",
         {
           hidden: !pointIsHovered,
           "-translate-x-1/2": inYAxisTransformThreshold,
@@ -43,7 +43,6 @@ export const MapTooltip = ({
         top:
           tooltipData.mouseCoords[1] +
           (inYAxisTransformThreshold ? tooltipYOffset : -tooltipYOffset),
-        boxShadow: "0px 9px 23px -12px rgba(253,253,253,0.24)",
       }}
     >
       <div>
