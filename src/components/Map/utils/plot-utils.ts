@@ -1,24 +1,13 @@
 import {
-  CitiesData,
-  CitiesDataWithCoords,
-  TooltipData,
-} from "./../../../types";
-import {
   select,
   geoAlbersUsa,
   geoPath,
-  GeoProjection,
-  scaleLinear,
-  extent,
   Selection,
   BaseType,
   zoom,
   GeoPath,
   GeoPermissibleObjects,
-  ScaleLinear,
 } from "d3";
-import { cities2013 } from "./data/cities2013";
-import { DebouncedFunc } from "lodash";
 
 const padding = 50;
 const mapGrey = "#D1D5DB"; //"#1F2937";
@@ -43,32 +32,6 @@ const getMapProjection = (width: number, height: number, polygons: any) => {
   );
 };
 
-const getCitiesDataWithCoords = (
-  projection: GeoProjection,
-  activeYearData: CitiesData[]
-) => {
-  return activeYearData.map((city, i) => ({
-    ...city,
-    coords: projection([city.longitude, city.latitude]),
-  }));
-};
-
-const getMaxRadiusFromWindowWidth = (width: number) => {
-  if (width > 769) return 100;
-  return 50;
-};
-
-const getRadiusScaleBasedOnWindowWidth = (width: number) => {
-  return scaleLinear()
-    .domain(
-      extent(cities2013.map((city) => Number(city.population))) as [
-        number,
-        number
-      ]
-    )
-    .range([3, getMaxRadiusFromWindowWidth(width)]);
-};
-
 const getMapZoom = (
   parentGroup: Selection<BaseType, unknown, HTMLElement, any>
 ) => {
@@ -76,7 +39,7 @@ const getMapZoom = (
     .scaleExtent([1, 8])
     .on("zoom", (event) => {
       parentGroup.selectAll("path").attr("transform", event.transform);
-      parentGroup.selectAll("circle").attr("transform", event.transform);
+      parentGroup.selectAll("line").attr("transform", event.transform);
     });
 };
 
@@ -97,81 +60,39 @@ const plotUsBasemap = (
   });
 };
 
-const plotMapPoints = (
-  pointsGroup: Selection<SVGSVGElement, unknown, HTMLElement, any>,
-  cityData: CitiesDataWithCoords[],
-  radiusScale: ScaleLinear<number, number, never>,
-  debounceSetMouse: DebouncedFunc<
-    React.Dispatch<React.SetStateAction<TooltipData>>
-  >,
-  setPointIsHovered: (value: React.SetStateAction<boolean>) => void
-) => {
-  return requestAnimationFrame(() => {
-    pointsGroup
-      .selectAll("circle")
-      .data(cityData)
-      .join("circle")
-      .transition()
-      .attr("cx", (d: any) => (d.coords === null ? null : d.coords[0]))
-      .attr("cy", (d: any) => (d.coords === null ? null : d.coords[1]))
-      .attr("r", (d) => radiusScale(Number(d.population)))
-      .attr("fill", (d, i) => d.color)
-      .attr("fill-opacity", 0.7)
-      .attr("stroke", mapGrey)
-      .attr("stroke-width", 0.5);
-
-    pointsGroup
-      .selectAll("circle")
-      .data(cityData)
-      .on("mouseenter", (event, d: any) => {
-        debounceSetMouse({
-          mouseCoords: [event.pageX, event.pageY],
-          data: d,
-        });
-        setPointIsHovered(true);
-      })
-      .on("mousemove", (event: any, d: any) => {
-        debounceSetMouse({
-          mouseCoords: [event.pageX, event.pageY],
-          data: d,
-        });
-      })
-      .on("mouseleave", () => {
-        setPointIsHovered(false);
-      });
-  });
-};
-
-export const drawMap = (
-  width: number,
-  height: number,
-  statePolygons: any,
-  debounceSetMouse: DebouncedFunc<
-    React.Dispatch<React.SetStateAction<TooltipData>>
-  >,
-  setPointIsHovered: (value: React.SetStateAction<boolean>) => void,
-  activeYearData: CitiesData[]
-) => {
+export const drawMap = (width: number, height: number, statePolygons: any) => {
   const { svg, mapGroup, parentGroup, pointsGroup } = getMapSelections();
+
+  const nCellsAcross = 100;
+  const cellWidth = width / nCellsAcross;
+  const nCellsDown = Math.floor(height / cellWidth);
+
+  const coords: number[][] = [];
+
+  for (var i = 0; i < nCellsAcross; i++) {
+    for (var j = 0; j < nCellsDown; j++) {
+      coords.push([cellWidth * i, cellWidth * j]);
+    }
+  }
+
+  const lineLength = cellWidth / 2;
+
+  pointsGroup
+    .selectAll("line")
+    .data(coords)
+    .join("line")
+    .attr("stroke", "red")
+    .attr("x1", (d) => d[0])
+    .attr("x2", (d) => d[0] + lineLength)
+    .attr("y1", (d) => d[1])
+    .attr("y2", (d) => d[1] + Math.random() * 5);
 
   const projection = getMapProjection(width, height, statePolygons);
   const pathGenerator = geoPath().projection(projection);
 
-  const cityData = getCitiesDataWithCoords(projection, activeYearData);
-
-  const radiusScale = getRadiusScaleBasedOnWindowWidth(width);
-
   const mapZoom = getMapZoom(parentGroup);
 
   plotUsBasemap(mapGroup, statePolygons, pathGenerator);
-
-  plotMapPoints(
-    pointsGroup,
-    cityData,
-    radiusScale,
-    debounceSetMouse,
-    setPointIsHovered
-  );
 
   svg.call(mapZoom as any);
 };

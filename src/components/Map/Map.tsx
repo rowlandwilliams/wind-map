@@ -1,35 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
-import { debounce, throttle } from "lodash";
+import { debounce } from "lodash";
 import { statePolygons } from "./utils/data/statePolygons";
-import { MapTooltip } from "./MapTooltip/MapTooltip";
-import { TooltipData } from "../../types";
 import { drawMap } from "./utils/plot-utils";
-import { TimeRadio } from "./TimeSlider/TimeSlider";
-import { citiesTimeSeries } from "./utils/data/citiesTimeSeries";
-
-const initialState = {
-  mouseCoords: [],
-  data: null,
-};
 
 export const Map = () => {
   const parentRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
-  const [pointIsHovered, setPointIsHovered] = useState(false);
-  const [tooltipData, setTooltipData] = useState<TooltipData>(initialState);
+
   const [isLoaded, setIsLoaded] = useState(false);
-  const [activeYear, setActiveYear] = useState(2000);
-
-  const debounceSetMouse = useMemo(
-    () => throttle(setTooltipData, 10),
-    [setTooltipData]
-  );
-
-  const handleYearChange = (newYear: number) => {
-    setActiveYear(newYear);
-  };
 
   const handleWindowResize = debounce((current: HTMLDivElement) => {
     setWidth(current.offsetWidth);
@@ -47,22 +27,15 @@ export const Map = () => {
   }, [parentRef, handleWindowResize]);
 
   useEffect(() => {
-    drawMap(
-      width,
-      height,
-      statePolygons,
-      debounceSetMouse,
-      setPointIsHovered,
-      citiesTimeSeries.filter((point) => point.year === activeYear)
-    );
+    drawMap(width, height, statePolygons);
     setIsLoaded(true);
-  }, [width, height, debounceSetMouse, activeYear]);
+  }, [width, height]);
 
   return (
     <>
       <div
         className={classNames(
-          "relative w-screen h-96 md:h-screen transition-all duration-1000 bg-gray-900",
+          "relative w-screen h-96 md:h-screen transition-all duration-1000",
           { "opacity-0": !isLoaded }
         )}
         ref={parentRef}
@@ -78,21 +51,6 @@ export const Map = () => {
           </g>
         </svg>
       </div>
-      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 font-semibold p-4 font-tt-interfaces-bold text-gray-100">
-        Population of the 400 Largest US cities in {activeYear}
-      </div>
-      <TimeRadio
-        sliderMin={2000}
-        sliderMax={2013}
-        activeYear={activeYear}
-        handleYearChange={handleYearChange}
-      />
-      <MapTooltip
-        pointIsHovered={pointIsHovered}
-        tooltipData={tooltipData}
-        width={width}
-        height={height}
-      />
     </>
   );
 };
