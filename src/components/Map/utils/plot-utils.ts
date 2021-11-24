@@ -10,7 +10,7 @@ import {
 } from "d3";
 
 const padding = 50;
-const mapGrey = "#D1D5DB"; //"#1F2937";
+const mapGrey = "#4B5563"; //"#1F2937";
 const backgroundColor = "#94a2a9";
 
 const getMapSelections = () => {
@@ -60,32 +60,57 @@ const plotUsBasemap = (
   });
 };
 
+function lineAnimate(
+  selection: Selection<SVGSVGElement, unknown, HTMLElement, any>
+) {
+  selection
+    .attr("x2", (d: any) => d[0][0])
+    .attr("y2", (d: any) => d[1][0])
+    .style("opacity", 0.8)
+    .transition()
+    .duration((d) => Math.random() * 10000)
+    .delay((d, i) => Math.random() * 10)
+    .attr("x2", (d: any) => d[0][1])
+    .attr("y2", (d: any) => d[1][1])
+    .transition()
+    .duration(1000)
+    .style("opacity", 0.3)
+    .on("end", function (this: any, event: any, d: any) {
+      select(this).call(lineAnimate as any);
+    });
+}
+
 export const drawMap = (width: number, height: number, statePolygons: any) => {
   const { svg, mapGroup, parentGroup, pointsGroup } = getMapSelections();
 
-  const nCellsAcross = 100;
+  const nCellsAcross = 50;
   const cellWidth = width / nCellsAcross;
-  const nCellsDown = Math.floor(height / cellWidth);
+  const nCellsDown = Math.ceil(height / cellWidth);
+  const lineLength = cellWidth / 2;
 
-  const coords: number[][] = [];
+  const coords: [number[], number[]][] = [];
 
   for (var i = 0; i < nCellsAcross; i++) {
     for (var j = 0; j < nCellsDown; j++) {
-      coords.push([cellWidth * i, cellWidth * j]);
+      coords.push([
+        [cellWidth * i, cellWidth * i + lineLength],
+        [
+          cellWidth * j + Math.random() * lineLength,
+          cellWidth * j + Math.random() * lineLength,
+        ],
+      ]);
     }
   }
-
-  const lineLength = cellWidth / 2;
 
   pointsGroup
     .selectAll("line")
     .data(coords)
     .join("line")
-    .attr("stroke", "red")
-    .attr("x1", (d) => d[0])
-    .attr("x2", (d) => d[0] + lineLength)
-    .attr("y1", (d) => d[1])
-    .attr("y2", (d) => d[1] + Math.random() * 5);
+    .attr("x1", (d: any) => d[0][0])
+    .attr("y1", (d: any) => d[1][0])
+
+    .attr("stroke", "#8B5CF6")
+    .call(lineAnimate as any);
 
   const projection = getMapProjection(width, height, statePolygons);
   const pathGenerator = geoPath().projection(projection);
