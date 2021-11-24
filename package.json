@@ -2,7 +2,7 @@
   "name": "cv-map",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://rowlandwilliams.github.io/us-cities-population-map",
+  "homepage": "https://rowlandwilliams.github.io/wind-map",
   "dependencies": {
     "@craco/craco": "^6.2.0",
     "@emotion/react": "^11.4.1",
