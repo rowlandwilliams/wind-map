@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/us-cities-population-map/static/css/main.97c28938.chunk.css",
+    "main.js": "/us-cities-population-map/static/js/main.708570a0.chunk.js",
+    "main.js.map": "/us-cities-population-map/static/js/main.708570a0.chunk.js.map",
+    "runtime-main.js": "/us-cities-population-map/static/js/runtime-main.a3f48081.js",
+    "runtime-main.js.map": "/us-cities-population-map/static/js/runtime-main.a3f48081.js.map",
+    "static/js/2.d859f408.chunk.js": "/us-cities-population-map/static/js/2.d859f408.chunk.js",
+    "static/js/2.d859f408.chunk.js.map": "/us-cities-population-map/static/js/2.d859f408.chunk.js.map",
+    "static/js/3.aa7ea9aa.chunk.js": "/us-cities-population-map/static/js/3.aa7ea9aa.chunk.js",
+    "static/js/3.aa7ea9aa.chunk.js.map": "/us-cities-population-map/static/js/3.aa7ea9aa.chunk.js.map",
+    "index.html": "/us-cities-population-map/index.html",
+    "static/css/main.97c28938.chunk.css.map": "/us-cities-population-map/static/css/main.97c28938.chunk.css.map",
+    "static/js/2.d859f408.chunk.js.LICENSE.txt": "/us-cities-population-map/static/js/2.d859f408.chunk.js.LICENSE.txt",
+    "static/media/index.css": "/us-cities-population-map/static/media/TTInterfaces-Regular.07f34fa9.ttf"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.a3f48081.js",
+    "static/js/2.d859f408.chunk.js",
+    "static/css/main.97c28938.chunk.css",
+    "static/js/main.708570a0.chunk.js"
+  ]
+}
