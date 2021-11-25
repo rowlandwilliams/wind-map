@@ -7,11 +7,14 @@ import {
   zoom,
   GeoPath,
   GeoPermissibleObjects,
+  easeLinear,
+  easeCubic,
 } from "d3";
 
 const padding = 50;
 const mapGrey = "#4B5563"; //"#1F2937";
 const backgroundColor = "#94a2a9";
+const windColor = "#c9c9c9";
 
 const getMapSelections = () => {
   return {
@@ -64,18 +67,20 @@ function lineAnimate(
   selection: Selection<SVGSVGElement, unknown, HTMLElement, any>
 ) {
   selection
+    .attr("x1", (d: any) => d[0][0])
     .attr("x2", (d: any) => d[0][0])
+    .attr("y1", (d: any) => d[1][0])
     .attr("y2", (d: any) => d[1][0])
-    .style("opacity", 0.8)
+    .style("opacity", 0.5)
     .transition()
+    .ease(easeCubic)
     .duration((d) => Math.random() * 10000)
-    .delay((d, i) => Math.random() * 10)
+    .delay((d) => Math.random() * 10)
     .attr("x2", (d: any) => d[0][1])
-    .attr("y2", (d: any) => d[1][1])
     .transition()
     .duration(1000)
-    .style("opacity", 0.3)
-    .on("end", function (this: any, event: any, d: any) {
+    .style("opacity", 0)
+    .on("end", function (this: any) {
       select(this).call(lineAnimate as any);
     });
 }
@@ -83,9 +88,9 @@ function lineAnimate(
 export const drawMap = (width: number, height: number, statePolygons: any) => {
   const { svg, mapGroup, parentGroup, pointsGroup } = getMapSelections();
 
-  const nCellsAcross = 50;
+  const nCellsAcross = 100;
   const cellWidth = width / nCellsAcross;
-  const nCellsDown = Math.ceil(height / cellWidth);
+  const nCellsDown = 100;
   const lineLength = cellWidth / 2;
 
   const coords: [number[], number[]][] = [];
@@ -93,7 +98,7 @@ export const drawMap = (width: number, height: number, statePolygons: any) => {
   for (var i = 0; i < nCellsAcross; i++) {
     for (var j = 0; j < nCellsDown; j++) {
       coords.push([
-        [cellWidth * i, cellWidth * i + lineLength],
+        [cellWidth * i, cellWidth * i + lineLength * 10],
         [
           cellWidth * j + Math.random() * lineLength,
           cellWidth * j + Math.random() * lineLength,
@@ -101,16 +106,6 @@ export const drawMap = (width: number, height: number, statePolygons: any) => {
       ]);
     }
   }
-
-  pointsGroup
-    .selectAll("line")
-    .data(coords)
-    .join("line")
-    .attr("x1", (d: any) => d[0][0])
-    .attr("y1", (d: any) => d[1][0])
-
-    .attr("stroke", "#8B5CF6")
-    .call(lineAnimate as any);
 
   const projection = getMapProjection(width, height, statePolygons);
   const pathGenerator = geoPath().projection(projection);
@@ -120,4 +115,11 @@ export const drawMap = (width: number, height: number, statePolygons: any) => {
   plotUsBasemap(mapGroup, statePolygons, pathGenerator);
 
   svg.call(mapZoom as any);
+
+  pointsGroup
+    .selectAll("line")
+    .data(coords)
+    .join("line")
+    .attr("stroke", windColor)
+    .call(lineAnimate as any);
 };
